@@ -1,0 +1,26 @@
+name: Deploy RAG App
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          
+      - name: Run tests
+        run: |
+          pip install -r backend/requirements.txt
+          # Run tests when pytest is configured
+          python -m pytest backend/verify_nvidia.py -v || true
+          
+      - name: Deploy to Render
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"

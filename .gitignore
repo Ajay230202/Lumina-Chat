@@ -1,0 +1,35 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+.env
+.env.*
+!.env.example
+!env.example
+
+# Node.js
+node_modules/
+**/node_modules/
+.next/
+**/.next/
+out/
+build/
+.env*.local
+npm-debug.log*
+
+# System / OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Workspace agents
+.agents/
+.gemini/
+temp/
