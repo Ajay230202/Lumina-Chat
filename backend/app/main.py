@@ -233,3 +233,23 @@ async def get_session_messages(session_id: str):
         return messages
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/documents/{doc_id}")
+async def delete_document(doc_id: str):
+    try:
+        # 1. Delete from Qdrant
+        qdrant_store.delete_document(doc_id)
+        # 2. Delete from Supabase
+        res = pipeline.supabase.delete_document(doc_id)
+        return {"status": "success", "deleted_document": res}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/sessions/{session_id}")
+async def delete_session(session_id: str):
+    try:
+        res = pipeline.supabase.delete_session(session_id)
+        return {"status": "success", "deleted_session": res}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

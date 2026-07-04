@@ -5,7 +5,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 export async function streamChat(
   query: string,
   history: Message[],
-  imageB64?: string,
+  imageB64: string | undefined,
   onChunk: (text: string) => void,
   onSources: (sources: Source[]) => void,
   onError: (err: string) => void,
@@ -129,3 +129,24 @@ export async function getSessionHistory(sessionId: string): Promise<any[]> {
   }
   return response.json();
 }
+
+export async function deleteDocument(docId: string): Promise<{ status: string }> {
+  const response = await fetch(`${API_URL}/api/documents/${docId}`, {
+    method: "DELETE"
+  });
+  if (!response.ok) {
+    throw new Error("Failed to delete document");
+  }
+  return response.json();
+}
+
+export async function deleteSession(sessionId: string): Promise<{ status: string }> {
+  const response = await fetch(`${API_URL}/api/sessions/${sessionId}`, {
+    method: "DELETE"
+  });
+  if (!response.ok) {
+    throw new Error("Failed to clear chat session");
+  }
+  return response.json();
+}
+

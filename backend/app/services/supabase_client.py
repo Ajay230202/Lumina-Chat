@@ -71,3 +71,12 @@ class SupabaseService:
     def get_session_history(self, session_id: str) -> list[dict]:
         res = self.client.table("messages").select("*").eq("session_id", session_id).order("created_at").execute()
         return res.data if res.data else []
+
+    def delete_document(self, doc_id: str) -> dict:
+        res = self.client.table("documents").delete().eq("id", doc_id).execute()
+        return res.data[0] if res.data else {}
+
+    def delete_session(self, session_id: str) -> dict:
+        res = self.client.table("sessions").delete().eq("id", session_id).execute()
+        return res.data[0] if res.data else {}
+

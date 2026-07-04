@@ -128,3 +128,17 @@ class QdrantStore:
             "indices": result.indices.tolist(),
             "values": result.values.tolist()
         }
+
+    def delete_document(self, doc_id: str):
+        self.client.delete(
+            collection_name=self.collection_name,
+            points_selector=models.Filter(
+                must=[
+                    models.FieldCondition(
+                        key="doc_id",
+                        match=models.MatchValue(value=doc_id),
+                    )
+                ]
+            ),
+        )
+

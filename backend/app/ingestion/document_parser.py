@@ -6,9 +6,9 @@ from docling.datamodel.base_models import InputFormat
 class DocumentParser:
     def __init__(self):
         pipeline_opts = PdfPipelineOptions(
-            do_ocr=True,
+            do_ocr=False,
             do_table_structure=True,
-            generate_page_images=True,
+            generate_page_images=False,
         )
         self.converter = DocumentConverter(
             format_options={

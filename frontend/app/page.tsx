@@ -13,10 +13,11 @@ import {
   Loader2,
   FolderOpen,
   Info,
-  Pencil
+  Pencil,
+  Trash2
 } from 'lucide-react';
 import { Message, Source } from '../lib/types';
-import { streamChat, uploadFile, getIngestStatus, getDocuments, createSession, getSessionHistory } from '../lib/api';
+import { streamChat, uploadFile, getIngestStatus, getDocuments, createSession, getSessionHistory, deleteDocument, deleteSession } from '../lib/api';
 
 interface TableData {
   headers: string[];
@@ -295,7 +296,34 @@ export default function Home() {
     }
   };
 
+  const handleDeleteDocument = async (docId: string) => {
+    if (!confirm("Are you sure you want to delete this document from the knowledge base?")) return;
+    try {
+      await deleteDocument(docId);
+      fetchDocs();
+    } catch (err) {
+      console.error("Failed to delete document:", err);
+    }
+  };
+
+  const handleClearChat = async () => {
+    if (!sessionId) return;
+    if (!confirm("Are you sure you want to clear the chat history?")) return;
+    try {
+      await deleteSession(sessionId);
+      localStorage.removeItem('lumina_session_id');
+      setMessages([]);
+      
+      const session = await createSession();
+      localStorage.setItem('lumina_session_id', session.id);
+      setSessionId(session.id);
+    } catch (err) {
+      console.error("Failed to clear chat session:", err);
+    }
+  };
+
   // Submit query
+
   const handleSend = async () => {
     if (!input.trim() && !imageB64) return;
 
@@ -557,7 +585,7 @@ export default function Home() {
                         <span className="text-[9px] text-[#6E645E] font-medium tracking-wide bg-[#F4F0EA] px-1 rounded uppercase">{doc.dept}</span>
                       </div>
                     </div>
-                    <div className="shrink-0 pl-1">
+                    <div className="shrink-0 pl-1 flex items-center gap-2">
                       {doc.status === 'ready' && (
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 block" title="Ready"></span>
                       )}
@@ -567,6 +595,13 @@ export default function Home() {
                       {doc.status === 'failed' && (
                         <span className="w-1.5 h-1.5 rounded-full bg-rose-500 block" title="Failed"></span>
                       )}
+                      <button
+                        onClick={() => handleDeleteDocument(doc.id)}
+                        className="text-[#6E645E] hover:text-rose-600 transition-colors p-1 rounded hover:bg-[#F4F0EA]"
+                        title="Delete source"
+                      >
+                        <Trash2 size={13} />
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -592,8 +627,17 @@ export default function Home() {
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span className="text-xs font-semibold text-[#2C2621] tracking-wide uppercase">{getHeaderLabel(dept)}</span>
           </div>
-          <div className="text-xs text-[#6E645E] font-medium tracking-wide">
-            Multi-Agent Hybrid Retrieval & Cognitive Synthesis Loop
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleClearChat}
+              className="text-xs font-semibold text-[#6E645E] hover:text-rose-600 transition-colors px-3 py-1.5 rounded-lg border border-[#E8E2D9] bg-white hover:bg-rose-50 hover:border-rose-200 shadow-sm flex items-center gap-1.5"
+            >
+              <Trash2 size={13} />
+              Clear Chat
+            </button>
+            <div className="text-xs text-[#6E645E] font-medium tracking-wide hidden md:block">
+              Multi-Agent Hybrid Retrieval & Cognitive Synthesis Loop
+            </div>
           </div>
         </header>
 
