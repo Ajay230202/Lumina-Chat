@@ -14,7 +14,8 @@ import {
   FolderOpen,
   Info,
   Pencil,
-  Trash2
+  Trash2,
+  Menu
 } from 'lucide-react';
 import { Message, Source } from '../lib/types';
 import { streamChat, uploadFile, getIngestStatus, getDocuments, createSession, getSessionHistory, deleteDocument, deleteSession } from '../lib/api';
@@ -168,6 +169,7 @@ function compressImage(file: File, maxWidth: number, maxHeight: number, quality:
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
@@ -495,8 +497,16 @@ export default function Home() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#FBF9F6] text-[#2C2621]">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-20 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* LEFT SIDEBAR - Ingestion Console */}
-      <aside className="w-80 bg-[#F4F0EA] border-r border-[#E8E2D9] flex flex-col justify-between h-full">
+      <aside className={`${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:static z-30 w-80 bg-[#F4F0EA] border-r border-[#E8E2D9] flex flex-col justify-between h-full transition-transform duration-300 ease-in-out`}>
         <div className="p-6 overflow-y-auto flex-1 space-y-6">
           <div className="flex items-center gap-3">
             <div className="bg-gradient-to-tr from-[#c05a3e] to-[#a84c30] p-2.5 rounded-xl text-white shadow-md">
@@ -620,12 +630,18 @@ export default function Home() {
       </aside>
 
       {/* RIGHT MAIN AREA - Chat Interface */}
-      <main className="flex-1 flex flex-col bg-[#FBF9F6]">
+      <main className="flex-1 flex flex-col bg-[#FBF9F6] min-w-0">
         {/* Top Header */}
-        <header className="h-16 border-b border-[#E8E2D9] bg-[#F4F0EA] px-8 flex items-center justify-between shadow-sm">
+        <header className="h-16 border-b border-[#E8E2D9] bg-[#F4F0EA] px-4 md:px-8 flex items-center justify-between shadow-sm shrink-0">
           <div className="flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-xs font-semibold text-[#2C2621] tracking-wide uppercase">{getHeaderLabel(dept)}</span>
+            <button 
+              className="md:hidden p-1.5 -ml-1.5 text-[#6E645E] hover:text-[#2C2621] hover:bg-[#E8E2D9] rounded-lg transition-colors"
+              onClick={() => setIsSidebarOpen(true)}
+            >
+              <Menu size={20} />
+            </button>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse hidden sm:block"></span>
+            <span className="text-[11px] sm:text-xs font-semibold text-[#2C2621] tracking-wide uppercase truncate max-w-[150px] sm:max-w-none">{getHeaderLabel(dept)}</span>
           </div>
           <div className="flex items-center gap-4">
             <button
@@ -642,9 +658,9 @@ export default function Home() {
         </header>
 
         {/* Message Area */}
-        <div className="flex-1 overflow-y-auto p-8 space-y-6">
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
           {messages.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center max-w-md mx-auto space-y-4">
+            <div className="h-full flex flex-col items-center justify-center text-center max-w-md mx-auto space-y-4 px-4">
               <div className="w-16 h-16 rounded-full bg-[#F4F0EA] flex items-center justify-center text-[#c05a3e] border border-[#E8E2D9] shadow-inner animate-pulse">
                 <Sparkles size={24} />
               </div>
@@ -773,7 +789,7 @@ export default function Home() {
         </div>
 
         {/* Input Bar Area */}
-        <footer className="p-6 border-t border-[#E8E2D9] bg-[#F4F0EA]">
+        <footer className="p-4 md:p-6 border-t border-[#E8E2D9] bg-[#F4F0EA]">
           <div className="max-w-3xl mx-auto">
             {/* Attached Image preview banner before sending */}
             {imageFileName && (
